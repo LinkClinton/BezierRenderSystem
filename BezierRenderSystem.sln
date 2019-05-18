@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.452
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "References", "References", "{04DDD5E6-2E70-4647-9B66-D35DEEFE91A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BezierRenderSystem", "BezierRenderSystem\BezierRenderSystem.csproj", "{F85955D3-BBB0-41B7-A541-0558C4A90B05}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Readme", "Readme", "{D456DBC9-32DD-42F1-968C-54BB7A19F534}"
+	ProjectSection(SolutionItems) = preProject
+		readme.md = readme.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F85955D3-BBB0-41B7-A541-0558C4A90B05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F85955D3-BBB0-41B7-A541-0558C4A90B05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F85955D3-BBB0-41B7-A541-0558C4A90B05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F85955D3-BBB0-41B7-A541-0558C4A90B05}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {09D0233B-66D2-4571-AE54-339D24A11612}
+	EndGlobalSection
+EndGlobal
