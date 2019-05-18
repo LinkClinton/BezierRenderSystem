@@ -4,6 +4,8 @@ There is simple quadratic bezier(**Bézier**) curve render system.
 
 The core code of rendering is `BezierRender` using `C#` and `Direct3D11`.
 
+See more [Click](https://linkclinton.com/index.php/2019/05/14/bezier-render-system/).
+
 ## Framework
 
 This code is based on my framework(`GalEngine`). But it is easy to understand or translate to other framework.
