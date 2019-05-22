@@ -49,9 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BezierRenderSystem\BezierDrawSystem.cs" />
-    <Compile Include="BezierRenderSystem\BezierRender.cs" />
+    <Compile Include="BezierRenderSystem\BezierRender\BezierRender.cs" />
     <Compile Include="BezierRenderSystem\BezierFillSystem.cs" />
-    <Compile Include="BezierRenderSystem\BezierRender\BezierRender.DrawBezier.cs" />
+    <Compile Include="BezierRenderSystem\BezierRender\BezierRender.Draw.cs" />
     <Compile Include="BezierRenderSystem\BoundingBox.cs" />
     <Compile Include="BezierRenderSystem\Component\BezierComponent.cs" />
     <Compile Include="BezierRenderSystem\QuadraticBezierCurve.cs" />
@@ -66,7 +66,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="app.manifest" />
-    <Compile Include="BezierRenderSystem\BezierRender\BezierRender.FillBezier.cs" />
+    <Compile Include="BezierRenderSystem\BezierRender\BezierRender.Fill.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="BezierRenderSystem\Asset\DrawBezierShader.hlsl" />

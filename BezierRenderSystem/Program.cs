@@ -110,7 +110,7 @@ namespace BezierRenderSystem
             GameSystems.MainScene = new GameScene("Main");
 
             Random random = new Random(0);
-            Flower[] flowers = new Flower[1000];
+            Flower[] flowers = new Flower[500];
 
             for (int i = 0; i < flowers.Length; i++)
             {
