@@ -17,7 +17,7 @@ namespace BezierRenderSystem
             (float)mRandom.NextDouble(),
             (float)mRandom.NextDouble(),
             (float)mRandom.NextDouble(),
-            (float)mRandom.NextDouble());
+            (float)mRandom.NextDouble() * 0.5f + 0.5f);
 
         public GameObject[] Leaves { get; }
 

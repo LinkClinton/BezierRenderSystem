@@ -134,6 +134,7 @@ float4 ps_main(
 	float2 texcoord : TEXCOORD,
 	float4 color : COLOR) : SV_TARGET
 {
+    //return float4(1, 0, 0, 1);
     //solve equation (-2A^2)t^3 + (-3AB)t^2 + (2AP - 2AC - B^2)t + B(P - C) = 0
     //A = (-2A^2) = coefficient0.x
     //B = (-3AB) = coefficient0.y

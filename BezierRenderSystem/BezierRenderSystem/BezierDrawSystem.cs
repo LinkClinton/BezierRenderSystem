@@ -61,7 +61,7 @@ namespace BezierRenderSystem
             {
                 var component = gameObject.GetComponent<BezierComponent>();
 
-                mRender.DrawBezier(component.Controls, component.Colors[0], 1.0f);
+                mRender.DrawBezier(component.Controls, component.Colors[0], 2.0f);
             }
 
             mRender.EndDraw();

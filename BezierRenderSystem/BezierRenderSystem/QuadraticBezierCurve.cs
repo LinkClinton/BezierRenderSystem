@@ -33,8 +33,8 @@ namespace BezierRenderSystem
             var C = parameters[2];
 
             //ep = 0, ep = 1
-            var derivativeQ0 = B;
-            var derivativeQ1 = 2 * A + B;
+            var derivativeQ0 = Vector2.Normalize(B);
+            var derivativeQ1 = Vector2.Normalize(2 * A + B);
 
             //delta offset for Q(0) and Q(1)
             var deltaQ0 = derivativeQ0 * width * 0.5f;
