@@ -87,7 +87,7 @@ float4 ps_main(
 
 		return float4(color.xyz, (sample0 + sample1 + sample2 + sample3) * 0.25f);
 	}
-
+	
 	if (edge_function > 0) discard;
 
 	return color;

@@ -10,20 +10,20 @@ using GalEngine.Runtime.Graphics;
 
 namespace BezierRenderSystem
 {
-    public class BezierRenderSystem : BehaviorSystem
+    public class BezierFillSystem : BehaviorSystem
     {
         private Image mCanvas;
         private BezierRender mRender;
 
         public Rectangle<int> Area { get; set; }
 
-        public BezierRenderSystem(GpuDevice device, Rectangle<int> area) : base("BezierRenderSystem")
+        public BezierFillSystem(BezierRender render, Rectangle<int> area) : base("BezierFillSystem")
         {
             RequireComponents.AddRequireComponentType<BezierComponent>();
 
             Area = area;
 
-            mRender = new BezierRender(device);
+            mRender = render;
 
             mCanvas = new Image(
                new Size<int>(Area.Right - Area.Left, Area.Bottom - Area.Top),
@@ -54,7 +54,7 @@ namespace BezierRenderSystem
 
         protected override void Excute(List<GameObject> passedGameObjectList)
         {
-            mRender.BeginDraw(mCanvas);
+            mRender.BeginDraw(mCanvas, BezierRender.RenderMode.Fill);
             mRender.Clear(mCanvas, new Color<float>(1, 1, 1, 1));
 
             Position<float>[] controls = new Position<float>[passedGameObjectList.Count * 3];
@@ -79,7 +79,7 @@ namespace BezierRenderSystem
             {
                 var component = x.GetComponent<BezierComponent>();
 
-                mRender.DrawBezier(component.Controls, component.Colors);
+                mRender.FillBezier(component.Controls, component.Colors);
             }*/
 
             mRender.EndDraw();

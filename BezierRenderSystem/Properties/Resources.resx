@@ -118,10 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="BezierRenderShader" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\BezierRenderSystem\Asset\BezierRenderShader.hlsl;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="DrawBezierShader" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\BezierRenderSystem\Asset\DrawBezierShader.hlsl;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="BeziersRenderShader" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\BezierRenderSystem\Asset\BeziersRenderShader.hlsl;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="FillBezierShader" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\BezierRenderSystem\Asset\FillBezierShader.hlsl;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="FillBeziersShader" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\BezierRenderSystem\Asset\FillBeziersShader.hlsl;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

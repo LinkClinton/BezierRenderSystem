@@ -48,9 +48,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BezierRenderSystem\BezierDrawSystem.cs" />
     <Compile Include="BezierRenderSystem\BezierRender.cs" />
-    <Compile Include="BezierRenderSystem\BezierRenderSystem.cs" />
+    <Compile Include="BezierRenderSystem\BezierFillSystem.cs" />
+    <Compile Include="BezierRenderSystem\BezierRender\BezierRender.DrawBezier.cs" />
+    <Compile Include="BezierRenderSystem\BoundingBox.cs" />
     <Compile Include="BezierRenderSystem\Component\BezierComponent.cs" />
+    <Compile Include="BezierRenderSystem\QuadraticBezierCurve.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -62,10 +66,12 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="app.manifest" />
+    <Compile Include="BezierRenderSystem\BezierRender\BezierRender.FillBezier.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="BezierRenderSystem\Asset\BezierRenderShader.hlsl" />
-    <Content Include="BezierRenderSystem\Asset\BeziersRenderShader.hlsl" />
+    <Content Include="BezierRenderSystem\Asset\DrawBezierShader.hlsl" />
+    <Content Include="BezierRenderSystem\Asset\FillBezierShader.hlsl" />
+    <Content Include="BezierRenderSystem\Asset\FillBeziersShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -79,5 +85,6 @@
       <Name>GalEngine</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

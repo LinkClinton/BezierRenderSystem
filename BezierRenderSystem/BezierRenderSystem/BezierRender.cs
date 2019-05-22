@@ -10,7 +10,7 @@ using GalEngine.Runtime.Graphics;
 
 namespace BezierRenderSystem
 {
-    class BezierRender
+    public partial class BezierRender
     {
         private struct Vertex
         {
@@ -25,19 +25,10 @@ namespace BezierRenderSystem
             public Matrix4x4 Projection;
         }
 
-        private struct TrianglePoints
+        public enum RenderMode
         {
-            public Vector4 Position0;
-            public Vector4 Position1;
-            public Vector4 Position2;
-           
-        }
-
-        private struct TriangleColors
-        {
-            public Vector4 Color0;
-            public Vector4 Color1;
-            public Vector4 Color2;
+            Fill,
+            Draw
         }
 
         private readonly GpuDevice mDevice;
@@ -46,28 +37,7 @@ namespace BezierRenderSystem
         private readonly GpuInputLayout mInputLayout;
         private readonly GpuBlendState mBlendState;
 
-
-        private readonly GpuVertexShader mBeziersVertexShader;
-        private readonly GpuVertexShader mVertexShader;
-
-        private readonly GpuPixelShader mBeziersPixelShader;
-        private readonly GpuPixelShader mPixelShader;
-
-        private readonly GpuBuffer mVertexBuffer;
-        private readonly GpuBuffer mIndexBuffer;
-
         private readonly GpuBuffer mTransformBuffer;
-
-        private readonly GpuBuffer mTrianglePointsBuffer;
-        private readonly GpuBuffer mTriangleColorsBuffer;
-
-        private GpuBufferArray mTrianglePointsBufferArray;
-        private GpuBufferArray mTriangleColorsBufferArray;
-        private GpuBufferArray mTrianglePointsCanvasBufferArray;
-
-        private GpuResourceUsage mTrianglePointsBufferArrayUsage;
-        private GpuResourceUsage mTriangleColorsBufferArrayUsage;
-        private GpuResourceUsage mTrianglePointsCanvasBufferArrayUsage;
 
         private Matrix4x4 mProjection;
         private Size<int> mCanvasSize;
@@ -75,6 +45,8 @@ namespace BezierRenderSystem
         public Matrix4x4 Transform { get; set; }
 
         public bool MSAAStatus { get; }
+
+        public RenderMode Mode { get; private set; }
 
         public GpuDevice GpuDevice => mDevice;
 
@@ -101,12 +73,9 @@ namespace BezierRenderSystem
             //init rasterizer state
             mRasterizerState = new GpuRasterizerState(mDevice, GpuFillMode.Solid, GpuCullMode.None);
 
-            //compile vertex and pixel shader to render bezier curve
-            mBeziersVertexShader = new GpuVertexShader(mDevice, GpuVertexShader.Compile(Properties.Resources.BeziersRenderShader, "vs_main"));
-            mVertexShader = new GpuVertexShader(mDevice, GpuVertexShader.Compile(Properties.Resources.BezierRenderShader, "vs_main"));
-
-            mBeziersPixelShader = new GpuPixelShader(mDevice, GpuPixelShader.Compile(Properties.Resources.BeziersRenderShader, "ps_main"));
-            mPixelShader = new GpuPixelShader(mDevice, GpuPixelShader.Compile(Properties.Resources.BezierRenderShader, "ps_main"));
+            //initalize render component
+            InitializeFillComponent();
+            InitializeDrawComponent();
 
             //init input layout
             //Position : float3
@@ -117,42 +86,12 @@ namespace BezierRenderSystem
                 new InputElement("POSITION", 0, 12),
                 new InputElement("TEXCOORD", 0, 8),
                 new InputElement("COLOR", 0, 16)
-            }, mVertexShader);
-
-            //init vertex and index buffer
-            //vertex data will be made when we draw bezier curve
-            mVertexBuffer = new GpuBuffer(
-                Utility.SizeOf<Vertex>() * 3,
-                Utility.SizeOf<Vertex>() * 1,
-                mDevice,
-                GpuResourceInfo.VertexBuffer());
-
-            mIndexBuffer = new GpuBuffer(
-                Utility.SizeOf<uint>() * 3,
-                Utility.SizeOf<uint>() * 1,
-                mDevice,
-                GpuResourceInfo.IndexBuffer());
-
-            uint[] indices = new uint[] { 0, 1, 2 };
-
-            mIndexBuffer.Update(indices);
+            }, mFillBezierVertexShader);
 
             //init constant buffer
             mTransformBuffer = new GpuBuffer(
                 Utility.SizeOf<TransformMatrix>(),
                 Utility.SizeOf<TransformMatrix>(),
-                mDevice,
-                GpuResourceInfo.ConstantBuffer());
-
-            mTrianglePointsBuffer = new GpuBuffer(
-                Utility.SizeOf<TrianglePoints>(),
-                Utility.SizeOf<TrianglePoints>(),
-                mDevice,
-                GpuResourceInfo.ConstantBuffer());
-
-            mTriangleColorsBuffer = new GpuBuffer(
-                Utility.SizeOf<TriangleColors>(),
-                Utility.SizeOf<TriangleColors>(),
                 mDevice,
                 GpuResourceInfo.ConstantBuffer());
 
@@ -166,22 +105,35 @@ namespace BezierRenderSystem
                 color: new Vector4<float>(x: clear.Red, y: clear.Green, z: clear.Blue, w: clear.Alpha));
         }
 
-        public void BeginDraw(Image image)
+        public void BeginDraw(Image image, RenderMode mode)
         {
             //begin draw and we need set the render target before we draw anything
+            Mode = mode;
 
             //reset device and set render target
             mDevice.Reset();
             mDevice.SetRenderTarget(image);
 
-            //set blend state
+            //set blend and raster state and input layout
             mDevice.SetBlendState(mBlendState);
+            mDevice.SetInputLayout(mInputLayout);
             mDevice.SetRasterizerState(mRasterizerState);
 
-            //set input layout ,vertex shader, pixel shader and primitive type
-            mDevice.SetPixelShader(mPixelShader);
-            mDevice.SetInputLayout(mInputLayout);
-            mDevice.SetVertexShader(mVertexShader);
+            //set vertex shader, pixel shader
+            switch (Mode)
+            {
+                case RenderMode.Fill: 
+                    mDevice.SetPixelShader(mFillBezierPixelShader);
+                    mDevice.SetVertexShader(mFillBezierVertexShader);
+                    break;
+                case RenderMode.Draw:
+                    mDevice.SetPixelShader(mDrawBezierPixelShader);
+                    mDevice.SetVertexShader(mDrawBezierVertexShader);
+                    break;
+                default: throw new Exception("Mode Not Supported.");
+            }
+
+            //set primitive type
             mDevice.SetPrimitiveType(GpuPrimitiveType.TriangleList);
 
             //set view port
@@ -205,6 +157,7 @@ namespace BezierRenderSystem
         public void FillBezier(Position<float>[] controls, Color<float>[] colors)
         {
             Utility.Assert(controls.Length >= 3 && colors.Length >= 3);
+            Utility.Assert(Mode == RenderMode.Fill);
 
             Vertex[] vertices = new Vertex[3];
 
@@ -249,18 +202,18 @@ namespace BezierRenderSystem
             trianglePoints.Position1 = (trianglePoints.Position1 + new Vector4(1)) * size;
             trianglePoints.Position2 = (trianglePoints.Position2 + new Vector4(1)) * size;
 
-            trianglePoints.Position0.Y = mCanvasSize.Height- trianglePoints.Position0.Y;
+            trianglePoints.Position0.Y = mCanvasSize.Height - trianglePoints.Position0.Y;
             trianglePoints.Position1.Y = mCanvasSize.Height - trianglePoints.Position1.Y;
             trianglePoints.Position2.Y = mCanvasSize.Height - trianglePoints.Position2.Y;
             
             //update data to gpu
-            mVertexBuffer.Update(vertices);
+            mFillVertexBuffer.Update(vertices);
             mTransformBuffer.Update(transform);
             mTrianglePointsBuffer.Update(trianglePoints);
             mTriangleColorsBuffer.Update(triangleColors);
 
-            mDevice.SetVertexBuffer(mVertexBuffer);
-            mDevice.SetIndexBuffer(mIndexBuffer);
+            mDevice.SetVertexBuffer(mFillVertexBuffer);
+            mDevice.SetIndexBuffer(mFillIndexBuffer);
             mDevice.SetBuffer(mTransformBuffer, 0);
             mDevice.SetBuffer(mTrianglePointsBuffer, 1);
             mDevice.SetBuffer(mTriangleColorsBuffer, 2);
@@ -268,9 +221,91 @@ namespace BezierRenderSystem
             mDevice.DrawIndexed(3);
         }
 
+        public void DrawBezier(Position<float>[] controls, Color<float> color, float width = 2.0f)
+        {
+            Utility.Assert(controls.Length >= 3);
+            Utility.Assert(Mode == RenderMode.Draw);
+
+            //convert Position<T> to Vector2
+            Vector2[] points = new Vector2[]
+            {
+                new Vector2(controls[0].X, controls[0].Y),
+                new Vector2(controls[1].X, controls[1].Y),
+                new Vector2(controls[2].X, controls[2].Y)
+            };
+
+            //get bounding box(before transform) of bezier curve
+            var box = QuadraticBezierCurve.BoundingBox(points, width);
+
+            var vertices = new Vertex[]
+            {
+                new Vertex() { Position = new Vector3(box.Min.X, box.Min.Y, 0) },
+                new Vertex() { Position = new Vector3(box.Min.X, box.Max.Y, 0) },
+                new Vertex() { Position = new Vector3(box.Max.X, box.Max.Y, 0) },
+                new Vertex() { Position = new Vector3(box.Max.X, box.Min.Y, 0) }
+            };
+
+            for (int i = 0; i < 4; i++)
+            {
+                vertices[i].Color = new Vector4(color.Red, color.Green, color.Blue, color.Alpha);
+                vertices[i].TexCoord = new Vector2(width);
+            }
+
+            //we need transform the control points to screen space
+            var transformMatrix = Transform * mProjection;
+            var size = new Vector2(mCanvasSize.Width, mCanvasSize.Height) * 0.5f;
+
+            //transform points
+            for (int i = 0; i < 3; i++)
+            {
+                points[i] = (Vector2.Transform(points[i], transformMatrix) + Vector2.One) * size;
+                points[i].Y = mCanvasSize.Height - points[i].Y;
+            }
+
+            //get parameter format of bezier curve
+            //Q(t) = At^2 + B^t + C
+            var parameters = QuadraticBezierCurve.ParameterFormat(points);
+            var A = parameters[0];
+            var B = parameters[1];
+            var C = parameters[2];
+
+            //For point P, when any root of equation(Q'(s) * (P - Q(s)) = 0) is legal, the P is inside the curve
+            //The equation full-format is (-2A^2)t^3 + (-3AB)t^2 + (2AP - 2AC - B^2)t + B(P - C) = 0
+            //we can use Cardano formula to solve it in pixel shader.
+            //but we can cache some calculation for opt.
+            var c0 = -2 * Vector2.Dot(A, A);
+            var c1 = -3 * Vector2.Dot(A, B);
+            var c2 = -2 * Vector2.Dot(A, C) - Vector2.Dot(B, B);
+            var c3 = -Vector2.Dot(B, C);
+
+            var equation = new Equation()
+            {
+                Coefficient0 = new Vector4(c0, c1, c2, c3),
+                Coefficient1 = new Vector4(A.X, A.Y, B.X, B.Y),
+                Coefficient2 = new Vector4(C.X, C.Y, width, width)
+            };
+
+            mTransformBuffer.Update(new TransformMatrix()
+            {
+                World = Transform,
+                Projection = mProjection
+            });
+
+            mDrawBezierVertexBuffer.Update(vertices);
+            mEquationBuffer.Update(equation);
+
+            mDevice.SetVertexBuffer(mDrawBezierVertexBuffer);
+            mDevice.SetIndexBuffer(mDrawBezierIndexBuffer);
+            mDevice.SetBuffer(mTransformBuffer, 0);
+            mDevice.SetBuffer(mEquationBuffer, 1);
+
+            mDevice.DrawIndexed(6);
+        }
+
         public void FillBeziers(int count, Position<float>[] controls, Color<float>[] colors, Matrix4x4[] transforms)
         {
             Utility.Assert(controls.Length >= count * 3 && colors.Length >= count * 3);
+            Utility.Assert(Mode == RenderMode.Fill);
 
             if (count == 0) return;
 
@@ -365,12 +400,12 @@ namespace BezierRenderSystem
             mTrianglePointsCanvasBufferArray.Update(trianglePointsCanvas);
 
             //change shader we use
-            mDevice.SetVertexShader(mBeziersVertexShader);
-            mDevice.SetPixelShader(mBeziersPixelShader);
+            mDevice.SetVertexShader(mFillBeziersVertexShader);
+            mDevice.SetPixelShader(mFillBeziersPixelShader);
 
             //set vertex buffer
-            mDevice.SetVertexBuffer(mVertexBuffer);
-            mDevice.SetIndexBuffer(mIndexBuffer);
+            mDevice.SetVertexBuffer(mFillVertexBuffer);
+            mDevice.SetIndexBuffer(mFillIndexBuffer);
 
             //set constant buffer and resource
             mDevice.SetResourceUsage(mTrianglePointsBufferArrayUsage, 0);
@@ -381,8 +416,8 @@ namespace BezierRenderSystem
             mDevice.DrawIndexedInstanced(3, count);
 
             //reset the shader
-            mDevice.SetVertexShader(mVertexShader);
-            mDevice.SetPixelShader(mPixelShader);
+            mDevice.SetVertexShader(mFillBezierVertexShader);
+            mDevice.SetPixelShader(mFillBezierPixelShader);
         }
     }
 }

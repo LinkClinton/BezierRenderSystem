@@ -97,14 +97,20 @@ namespace BezierRenderSystem
                 Adapter = adapters[0]
             });
 
+            BezierRender bezierRender = new BezierRender(GameSystems.GpuDevice);
+
+            /*GameSystems.AddBehaviorSystem(
+                new BezierFillSystem(bezierRender,
+                new Rectangle<int>(0, 0, width, height)));*/
+
             GameSystems.AddBehaviorSystem(
-                new BezierRenderSystem(GameSystems.GpuDevice,
-                new Rectangle<int>(0, 0, width, height)));
+               new BezierDrawSystem(bezierRender,
+               new Rectangle<int>(0, 0, width, height)));
 
             GameSystems.MainScene = new GameScene("Main");
 
             Random random = new Random(0);
-            Flower[] flowers = new Flower[1000];
+            Flower[] flowers = new Flower[500];
 
             for (int i = 0; i < flowers.Length; i++)
             {
