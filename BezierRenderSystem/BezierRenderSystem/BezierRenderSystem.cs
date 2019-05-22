@@ -73,7 +73,7 @@ namespace BezierRenderSystem
                 colors[i * 3 + 2] = component.Colors[2];
             }
 
-            mRender.DrawBeziers(passedGameObjectList.Count, controls, colors, null);
+            mRender.FillBeziers(passedGameObjectList.Count, controls, colors, null);
 
             /*foreach (var x in passedGameObjectList)
             {

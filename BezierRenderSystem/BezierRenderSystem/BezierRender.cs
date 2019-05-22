@@ -202,7 +202,7 @@ namespace BezierRenderSystem
             mCanvasSize = null;
         }
 
-        public void DrawBezier(Position<float>[] controls, Color<float>[] colors)
+        public void FillBezier(Position<float>[] controls, Color<float>[] colors)
         {
             Utility.Assert(controls.Length >= 3 && colors.Length >= 3);
 
@@ -268,7 +268,7 @@ namespace BezierRenderSystem
             mDevice.DrawIndexed(3);
         }
 
-        public void DrawBeziers(int count, Position<float>[] controls, Color<float>[] colors, Matrix4x4[] transforms)
+        public void FillBeziers(int count, Position<float>[] controls, Color<float>[] colors, Matrix4x4[] transforms)
         {
             Utility.Assert(controls.Length >= count * 3 && colors.Length >= count * 3);
 
