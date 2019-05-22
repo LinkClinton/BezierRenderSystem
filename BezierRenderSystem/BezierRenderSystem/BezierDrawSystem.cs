@@ -57,12 +57,31 @@ namespace BezierRenderSystem
             mRender.BeginDraw(mCanvas, BezierRender.RenderMode.Draw);
             mRender.Clear(mCanvas, new Color<float>(1, 1, 1, 0));
 
-            foreach (var gameObject in passedGameObjectList)
+            Position<float>[] controls = new Position<float>[passedGameObjectList.Count * 3];
+            Color<float>[] colors = new Color<float>[passedGameObjectList.Count];
+            float[] width = new float[passedGameObjectList.Count];
+
+            for (int i = 0; i < passedGameObjectList.Count; i++)
+            {
+                var component = passedGameObjectList[i].GetComponent<BezierComponent>();
+
+                controls[i * 3 + 0] = component.Controls[0];
+                controls[i * 3 + 1] = component.Controls[1];
+                controls[i * 3 + 2] = component.Controls[2];
+
+                colors[i] = component.Colors[0];
+
+                width[i] = 2.0f;
+            }
+
+            mRender.DrawBeziers(passedGameObjectList.Count, controls, colors, width, null);
+
+            /*foreach (var gameObject in passedGameObjectList)
             {
                 var component = gameObject.GetComponent<BezierComponent>();
 
                 mRender.DrawBezier(component.Controls, component.Colors[0], 2.0f);
-            }
+            }*/
 
             mRender.EndDraw();
         }

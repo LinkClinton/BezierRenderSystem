@@ -291,11 +291,11 @@ namespace BezierRenderSystem
                 Projection = mProjection
             });
 
-            mDrawBezierVertexBuffer.Update(vertices);
+            mDrawVertexBuffer.Update(vertices);
             mEquationBuffer.Update(equation);
 
-            mDevice.SetVertexBuffer(mDrawBezierVertexBuffer);
-            mDevice.SetIndexBuffer(mDrawBezierIndexBuffer);
+            mDevice.SetVertexBuffer(mDrawVertexBuffer);
+            mDevice.SetIndexBuffer(mDrawIndexBuffer);
             mDevice.SetBuffer(mTransformBuffer, 0);
             mDevice.SetBuffer(mEquationBuffer, 1);
 
@@ -418,6 +418,145 @@ namespace BezierRenderSystem
             //reset the shader
             mDevice.SetVertexShader(mFillBezierVertexShader);
             mDevice.SetPixelShader(mFillBezierPixelShader);
+        }
+
+        public void DrawBeziers(int count, Position<float>[] controls, Color<float>[] colors, float[] width, Matrix4x4[] transforms)
+        {
+            Utility.Assert(controls.Length >= 3 * count && colors.Length >= count && width.Length >= count);
+            Utility.Assert(Mode == RenderMode.Draw);
+
+            if (count == 0) return;
+
+            TransformMatrix[] transformMatrices = new TransformMatrix[count];
+            Equation[] equations = new Equation[count];
+            Vector4[] color = new Vector4[count];
+
+            Vertex[] vertices = new Vertex[4]
+            {
+                new Vertex() { Position = new Vector3(0, 0, 0) },
+                new Vertex() { Position = new Vector3(0, 1, 0) },
+                new Vertex() { Position = new Vector3(1, 1, 0) },
+                new Vertex() { Position = new Vector3(1, 0, 0) }
+            };
+
+            var size = new Vector2(mCanvasSize.Width, mCanvasSize.Height) * 0.5f;
+
+            for (int index = 0; index < count; index++)
+            {
+                Vector2[] points = new Vector2[]
+                {
+                    new Vector2(controls[index * 3 + 0].X, controls[index * 3 + 0].Y),
+                    new Vector2(controls[index * 3 + 1].X, controls[index * 3 + 1].Y),
+                    new Vector2(controls[index * 3 + 2].X, controls[index * 3 + 2].Y)
+                };
+
+                //get bounding box(before transform) of bezier curve
+                var box = QuadraticBezierCurve.BoundingBox(points, width[index]);
+
+                //create transform matrix
+                transformMatrices[index] = new TransformMatrix()
+                {
+                    World =
+                        Matrix4x4.CreateScale(box.Max.X - box.Min.X, box.Max.Y - box.Min.Y, 1) *
+                        Matrix4x4.CreateTranslation(box.Min.X, box.Min.Y, 0) *
+                        Transform,
+                    Projection = mProjection
+                };
+
+                //we need transform the control points to screen space
+                var transformMatrix = (transforms == null ? Matrix4x4.Identity : transforms[index]) * Transform * mProjection;
+                
+                //transform points
+                for (int i = 0; i < 3; i++)
+                {
+                    points[i] = (Vector2.Transform(points[i], transformMatrix) + Vector2.One) * size;
+                    points[i].Y = mCanvasSize.Height - points[i].Y;
+                }
+
+                //get parameter format of bezier curve
+                //Q(t) = At^2 + B^t + C
+                var parameters = QuadraticBezierCurve.ParameterFormat(points);
+                var A = parameters[0];
+                var B = parameters[1];
+                var C = parameters[2];
+
+                //For point P, when any root of equation(Q'(s) * (P - Q(s)) = 0) is legal, the P is inside the curve
+                //The equation full-format is (-2A^2)t^3 + (-3AB)t^2 + (2AP - 2AC - B^2)t + B(P - C) = 0
+                //we can use Cardano formula to solve it in pixel shader.
+                //but we can cache some calculation for opt.
+                var c0 = -2 * Vector2.Dot(A, A);
+                var c1 = -3 * Vector2.Dot(A, B);
+                var c2 = -2 * Vector2.Dot(A, C) - Vector2.Dot(B, B);
+                var c3 = -Vector2.Dot(B, C);
+
+                equations[index] = new Equation()
+                {
+                    Coefficient0 = new Vector4(c0, c1, c2, c3),
+                    Coefficient1 = new Vector4(A.X, A.Y, B.X, B.Y),
+                    Coefficient2 = new Vector4(C.X, C.Y, width[index] * width[index] * 0.25f, width[index] * width[index] * 0.25f)
+                };
+
+                color[index] = new Vector4(colors[index].Red, colors[index].Green, colors[index].Blue, colors[index].Alpha);
+            }
+
+            if (mColorBufferArray == null || mColorBufferArray.ElementCount != count)
+            {
+                Utility.Dispose(ref mColorBufferArray);
+                Utility.Dispose(ref mEquationBufferArray);
+                Utility.Dispose(ref mTransformBufferArray);
+
+                Utility.Dispose(ref mColorBufferArrayUsage);
+                Utility.Dispose(ref mEquationBufferArrayUsage);
+                Utility.Dispose(ref mTransformBufferArrayUsage);
+
+                mColorBufferArray = new GpuBufferArray(
+                    Utility.SizeOf<Vector4>(),
+                    count,
+                    mDevice,
+                    GpuResourceInfo.BufferArray());
+
+                mEquationBufferArray = new GpuBufferArray(
+                    Utility.SizeOf<Equation>(),
+                    count,
+                    mDevice,
+                    GpuResourceInfo.BufferArray());
+
+                mTransformBufferArray = new GpuBufferArray(
+                    Utility.SizeOf<TransformMatrix>(),
+                    count,
+                    mDevice,
+                    GpuResourceInfo.BufferArray());
+
+                mColorBufferArrayUsage = new GpuResourceUsage(mDevice, mColorBufferArray);
+                mEquationBufferArrayUsage = new GpuResourceUsage(mDevice, mEquationBufferArray);
+                mTransformBufferArrayUsage = new GpuResourceUsage(mDevice, mTransformBufferArray);
+            }
+
+            mColorBufferArray.Update(color);
+            mEquationBufferArray.Update(equations);
+            mTransformBufferArray.Update(transformMatrices);
+
+            mDrawVertexBuffer.Update(vertices);
+
+            //change shader we use
+            mDevice.SetVertexShader(mDrawBeziersVertexShader);
+            mDevice.SetPixelShader(mDrawBeziersPixelShader);
+
+            //set vertex buffer
+            mDevice.SetVertexBuffer(mDrawVertexBuffer);
+            mDevice.SetIndexBuffer(mDrawIndexBuffer);
+
+            //set constant buffer and resource
+            mDevice.SetResourceUsage(mColorBufferArrayUsage, 0);
+            mDevice.SetResourceUsage(mEquationBufferArrayUsage, 1);
+            mDevice.SetResourceUsage(mTransformBufferArrayUsage, 2);
+
+            //drwa indexed instanced
+            mDevice.DrawIndexedInstanced(6, count);
+
+            //reset the shader
+            mDevice.SetVertexShader(mDrawBezierVertexShader);
+            mDevice.SetPixelShader(mDrawBezierPixelShader);
         }
     }
 }

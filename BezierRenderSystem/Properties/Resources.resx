@@ -121,6 +121,9 @@
   <data name="DrawBezierShader" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\BezierRenderSystem\Asset\DrawBezierShader.hlsl;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="DrawBeziersShader" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\BezierRenderSystem\Asset\DrawBeziersShader.hlsl;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="FillBezierShader" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\BezierRenderSystem\Asset\FillBezierShader.hlsl;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>

@@ -73,6 +73,16 @@ namespace BezierRenderSystem.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] DrawBeziersShader {
+            get {
+                object obj = ResourceManager.GetObject("DrawBeziersShader", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] FillBezierShader {
             get {
                 object obj = ResourceManager.GetObject("FillBezierShader", resourceCulture);

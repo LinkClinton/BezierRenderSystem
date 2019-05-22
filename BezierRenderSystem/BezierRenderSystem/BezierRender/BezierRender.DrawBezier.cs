@@ -21,17 +21,30 @@ namespace BezierRenderSystem
         }
 
         private GpuVertexShader mDrawBezierVertexShader;
+        private GpuVertexShader mDrawBeziersVertexShader;
 
         private GpuPixelShader mDrawBezierPixelShader;
+        private GpuPixelShader mDrawBeziersPixelShader;
 
-        private GpuBuffer mDrawBezierVertexBuffer;
-        private GpuBuffer mDrawBezierIndexBuffer;
+        private GpuBuffer mDrawVertexBuffer;
+        private GpuBuffer mDrawIndexBuffer;
         
         private GpuBuffer mEquationBuffer;
 
+        private GpuBufferArray mColorBufferArray;
+        private GpuBufferArray mEquationBufferArray;
+        private GpuBufferArray mTransformBufferArray;
+
+        private GpuResourceUsage mColorBufferArrayUsage;
+        private GpuResourceUsage mEquationBufferArrayUsage;
+        private GpuResourceUsage mTransformBufferArrayUsage;
+
         private void InitializeDrawComponent()
         {
+            mDrawBeziersVertexShader = new GpuVertexShader(mDevice, GpuVertexShader.Compile(Properties.Resources.DrawBeziersShader, "vs_main"));
             mDrawBezierVertexShader = new GpuVertexShader(mDevice, GpuVertexShader.Compile(Properties.Resources.DrawBezierShader, "vs_main"));
+
+            mDrawBeziersPixelShader = new GpuPixelShader(mDevice, GpuPixelShader.Compile(Properties.Resources.DrawBeziersShader, "ps_main"));
             mDrawBezierPixelShader = new GpuPixelShader(mDevice, GpuPixelShader.Compile(Properties.Resources.DrawBezierShader, "ps_main"));
 
             mEquationBuffer = new GpuBuffer(
@@ -40,13 +53,13 @@ namespace BezierRenderSystem
                 mDevice,
                 GpuResourceInfo.ConstantBuffer());
 
-            mDrawBezierVertexBuffer = new GpuBuffer(
+            mDrawVertexBuffer = new GpuBuffer(
                 Utility.SizeOf<Vertex>() * 4,
                 Utility.SizeOf<Vertex>(),
                 mDevice,
                 GpuResourceInfo.VertexBuffer());
 
-            mDrawBezierIndexBuffer = new GpuBuffer(
+            mDrawIndexBuffer = new GpuBuffer(
                 Utility.SizeOf<uint>() * 6,
                 Utility.SizeOf<uint>(),
                 mDevice,
@@ -58,7 +71,7 @@ namespace BezierRenderSystem
                 0, 2, 3
             };
 
-            mDrawBezierIndexBuffer.Update(indices);
+            mDrawIndexBuffer.Update(indices);
         }
     }
 }

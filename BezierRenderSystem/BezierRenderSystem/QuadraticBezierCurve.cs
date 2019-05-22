@@ -40,8 +40,6 @@ namespace BezierRenderSystem
             var deltaQ0 = derivativeQ0 * width * 0.5f;
             var deltaQ1 = derivativeQ1 * width * 0.5f;
 
-
-
             //accept the control points
             BoundingBox box = new BoundingBox(controls[0], controls[1]);
             box.Union(controls[2]);

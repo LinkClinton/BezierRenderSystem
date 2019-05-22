@@ -94,7 +94,7 @@ namespace BezierRenderSystem
                 GameName = "Bezier Render System",
                 IconName = null,
                 WindowSize = new Size<int>(width, height),
-                Adapter = adapters[0]
+                Adapter = adapters[1]
             });
 
             BezierRender bezierRender = new BezierRender(GameSystems.GpuDevice);
@@ -110,7 +110,7 @@ namespace BezierRenderSystem
             GameSystems.MainScene = new GameScene("Main");
 
             Random random = new Random(0);
-            Flower[] flowers = new Flower[500];
+            Flower[] flowers = new Flower[1000];
 
             for (int i = 0; i < flowers.Length; i++)
             {

@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="BezierRenderSystem\Asset\DrawBezierShader.hlsl" />
+    <None Include="BezierRenderSystem\Asset\DrawBeziersShader.hlsl" />
     <Content Include="BezierRenderSystem\Asset\FillBezierShader.hlsl" />
     <Content Include="BezierRenderSystem\Asset\FillBeziersShader.hlsl" />
   </ItemGroup>
