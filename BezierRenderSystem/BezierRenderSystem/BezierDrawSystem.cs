@@ -49,7 +49,7 @@ namespace BezierRenderSystem
 
         protected override void Present(PresentRender render)
         {
-            render.Mask(mCanvas, Area, 1.0f);
+            render.Draw(mCanvas, Area, 1.0f);
         }
 
         protected override void Excute(List<GameObject> passedGameObjectList)

@@ -282,9 +282,9 @@ namespace BezierRenderSystem
             {
                 Coefficient0 = new Vector4(c0, c1, c2, c3),
                 Coefficient1 = new Vector4(A.X, A.Y, B.X, B.Y),
-                Coefficient2 = new Vector4(C.X, C.Y, width * 0.5f, width * 0.5f)
+                Coefficient2 = new Vector4(C.X, C.Y, width * width * 0.25f, width * width * 0.25f)
             };
-
+            
             mTransformBuffer.Update(new TransformMatrix()
             {
                 World = Transform,

@@ -114,6 +114,13 @@ float2 bezier_curve_point(float2 A, float2 B, float2 C, float t)
     return A * t * t + B * t + C;
 }
 
+float distance2(float2 u, float2 v) 
+{
+	float2 offset = u - v;
+
+	return offset.x * offset.x + offset.y * offset.y;
+}
+
 float msaa_sample(float2 position, float alpha) 
 {
 	//solve equation (-2A^2)t^3 + (-3AB)t^2 + (2AP - 2AC - B^2)t + B(P - C) = 0
@@ -135,20 +142,20 @@ float msaa_sample(float2 position, float alpha)
 
 	if (root0 >= 0 && root0 <= 1.0f) {
 		float2 Q = bezier_curve_point(coefficient1.xy, coefficient1.zw, coefficient2.xy, root0);
-
-		if (distance(position.xy, Q) <= coefficient2.z) return alpha;
+		
+		if (distance2(position.xy, Q) <= coefficient2.z) return alpha;
 	}
 
 	if (root1 >= 0 && root1 <= 1.0f) {
 		float2 Q = bezier_curve_point(coefficient1.xy, coefficient1.zw, coefficient2.xy, root1);
 
-		if (distance(position.xy, Q) <= coefficient2.z) return alpha;
+		if (distance2(position.xy, Q) <= coefficient2.z) return alpha;
 	}
 
 	if (root2 >= 0 && root2 <= 1.0f) {
 		float2 Q = bezier_curve_point(coefficient1.xy, coefficient1.zw, coefficient2.xy, root2);
 
-		if (distance(position.xy, Q) <= coefficient2.z) return alpha;
+		if (distance2(position.xy, Q) <= coefficient2.z) return alpha;
 	}
 
 	return 0;
