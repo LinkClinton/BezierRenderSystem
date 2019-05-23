@@ -17,7 +17,7 @@ namespace BezierRenderSystem
             (float)mRandom.NextDouble(),
             (float)mRandom.NextDouble(),
             (float)mRandom.NextDouble(),
-            (float)mRandom.NextDouble() * 0.5f + 0.5f);
+            (float)mRandom.NextDouble() * 0.5f + 0.25f);
 
         public GameObject[] Leaves { get; }
 
@@ -99,13 +99,13 @@ namespace BezierRenderSystem
 
             BezierRender bezierRender = new BezierRender(GameSystems.GpuDevice);
 
-            /*GameSystems.AddBehaviorSystem(
-                new BezierFillSystem(bezierRender,
-                new Rectangle<int>(0, 0, width, height)));*/
-
             GameSystems.AddBehaviorSystem(
+                new BezierFillSystem(bezierRender,
+                new Rectangle<int>(0, 0, width, height)));
+
+            /*GameSystems.AddBehaviorSystem(
                new BezierDrawSystem(bezierRender,
-               new Rectangle<int>(0, 0, width, height)));
+               new Rectangle<int>(0, 0, width, height)));*/
 
             GameSystems.MainScene = new GameScene("Main");
 
